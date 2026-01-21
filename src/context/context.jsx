@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { generateText } from "../config/gemini";
 
 export const Context = createContext();
 
@@ -7,54 +8,92 @@ const ContextProvider = (props) => {
   const [currentChatId, setCurrentChatId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const currentChat = chats.find(chat => chat.id === currentChatId) || null;
+  const currentChat =
+    chats.find(chat => chat.id === currentChatId) || null;
 
-  // Start a new chat
   const startNewChat = () => {
-    const newChat = { id: Date.now(), messages: [] };
+    const newChat = {
+      id: Date.now(),
+      messages: []
+    };
     setChats(prev => [...prev, newChat]);
     setCurrentChatId(newChat.id);
     return newChat.id;
   };
 
-  // Select existing chat
   const selectChat = (id) => {
     setCurrentChatId(id);
   };
 
-  // Send prompt (from input or card)
-  const onSent = async (prompt) => {
+  const onSent = async (prompt, retries = 2) => {
     if (!prompt.trim()) return;
 
     let chatId = currentChatId;
 
+    // ✅ Ensure a chat always exists
     if (!chatId) {
       chatId = startNewChat();
     }
 
-    // Add user message
     setChats(prev =>
       prev.map(chat =>
         chat.id === chatId
-          ? { ...chat, messages: [...chat.messages, { type: "user", text: prompt }] }
+          ? {
+              ...chat,
+              messages: [...chat.messages, { type: "user", text: prompt }]
+            }
           : chat
       )
     );
 
     setLoading(true);
 
-    // Fake AI response (you can replace this with actual API later)
-    await new Promise(res => setTimeout(res, 700)); // simulate delay
-    const fakeResponse = `Gemini says: "${prompt}"`;
+    const attempt = async (remainingRetries) => {
+      try {
+        const result = await generateText(prompt);
+        const cleanResult = result
+          .replace(/[#*]/g, "")
+          .replace(/\n{2,}/g, "\n");
 
-    setChats(prev =>
-      prev.map(chat =>
-        chat.id === chatId
-          ? { ...chat, messages: [...chat.messages, { type: "ai", text: fakeResponse }] }
-          : chat
-      )
-    );
+        setChats(prev =>
+          prev.map(chat =>
+            chat.id === chatId
+              ? {
+                  ...chat,
+                  messages: [
+                    ...chat.messages,
+                    { type: "ai", text: cleanResult }
+                  ]
+                }
+              : chat
+          )
+        );
 
+      } catch (error) {
+        if (remainingRetries > 0) {
+          return attempt(remainingRetries - 1);
+        }
+
+        const fallback =
+          "Sorry, Gemini is currently overloaded. Please try again later.";
+
+        setChats(prev =>
+          prev.map(chat =>
+            chat.id === chatId
+              ? {
+                  ...chat,
+                  messages: [
+                    ...chat.messages,
+                    { type: "ai", text: fallback }
+                  ]
+                }
+              : chat
+          )
+        );
+      }
+    };
+
+    await attempt(retries);
     setLoading(false);
   };
 
