@@ -1,0 +1,148 @@
+/* Sidebar fixed position */
+.sidebar {
+    position: fixed;       /* FIXED! */
+    top: 0;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #f0f4f9;
+    padding: 20px 10px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    z-index: 999;
+}
+
+/* Expanded and collapsed widths */
+.sidebar.expanded {
+    width: 220px;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+/* Top section (menu + new chat) */
+.sidebar .top {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Menu icon */
+.sidebar img.menu {
+    width: 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* New chat button */
+.sidebar .new-chat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 40px;
+    font-size: 14px;
+    color: grey;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sidebar .new-chat img {
+    width: 16px;
+}
+.sidebar.collapsed .new-chat p {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* Scrollable Recent section */
+.sidebar .recent {
+    flex: 1; /* fills space between top & bottom */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* scrollable */
+    margin-top: 20px;
+}
+
+.sidebar .recent-title {
+    margin-bottom: 10px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .recent-title {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+}
+
+.sidebar .recent-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 5px;
+    border-radius: 40px;
+    color: #282828;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sidebar .recent-entry img {
+    width: 20px;
+}
+
+.sidebar.collapsed .recent-entry p {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+.sidebar .recent-entry:hover {
+    background-color: #e2e6eb;
+}
+
+/* Bottom section fixed inside sidebar */
+.sidebar .bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar .bottom-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.sidebar .bottom-item img {
+    width: 20px;
+}
+
+.sidebar.collapsed .bottom-item p {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* Smooth transitions */
+.sidebar p {
+    transition: all 0.3s ease;
+}
+
+/* Hide scrollbar in recent */
+.sidebar .recent::-webkit-scrollbar {
+    width: 5px;
+}
+
+.sidebar .recent::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+.sidebar .recent::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
